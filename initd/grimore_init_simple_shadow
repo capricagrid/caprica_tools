@@ -1,0 +1,65 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: opensim
+# Required-Start: $local_fs $remote_fs $network $syslog $named
+# Required-Stop: $local_fs $remote_fs $network $syslog $named
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# X-Interactive: false
+# Short-Description: opensim service
+### END INIT INFO
+
+#opensim service
+OPENSIM_USER="root"
+
+DAEMON="OpenSim.exe"
+
+start() {
+   echo "Starting opensim..."
+   HOMEDIR=`getent passwd $OPENSIM_USER | cut -d: -f6`
+   if [ -x /opt/os/bin/$DAEMON ]; then
+       HOME="/opt/os" start-stop-daemon --start -c $OPENSIM_USER --pidfile /opt/os/bin/OpenSim.pid --make-pidfile --exec /usr/bin/mono -d /opt/os/bin --background -- /opt/os/bin/OpenSim.exe -console=reset -background=true
+   fi
+}
+
+stop() {
+   echo "Stopping opensim..."
+   HOMEDIR=`getent passwd $OPENSIM_USER | cut -d: -f6`
+   if [ -x /opt/os/bin/$DAEMON ]; then
+       start-stop-daemon -o -c $OPENSIM_USER -K -u $OPENSIM_USER --pidfile /opt/os/bin/OpenSim.pid -x /usr/bin/mono -- /opt/os/bin/OpenSim.exe -console=rest -background=true
+   fi
+}
+
+status() {
+
+   dbpid=`pgrep -u $OPENSIM_USER root`
+   if [ -z $dbpid ] ; then
+       echo "opensim for USER $OPENSIM_USER: not running."
+   else
+       echo "opensim for USER $OPENSIM_USER: running (pid $dbpid)"
+   fi
+
+}
+
+case "$1" in
+
+   start)
+       start
+       ;;
+   stop)
+       stop
+       ;;
+   restart|reload|force-reload)
+       stop
+       start
+       ;;
+   status)
+       status
+       ;;
+   *)
+       echo "Usage: /etc/init.d/opensim {start|stop|reload|force-reload|restart|status}"
+       exit 1
+
+esac
+
+exit 0
