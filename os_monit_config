@@ -17,7 +17,7 @@
 #
 
 
-check process opensim with pidfile /opt/os/bin/opensim.pid
+check process opensim with pidfile /opt/os/bin/OpenSim.pid
     start program = "/etc/init.d/opensim start"
         group root
     stop program = "/etc/init.d/opensim stop"
