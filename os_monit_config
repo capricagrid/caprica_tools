@@ -1,0 +1,31 @@
+# manage the OpenSim process for Your Sim
+#
+#
+# see 'daemon' setting in /etc/monit/monitrc for the cycle length.
+# on ubuntu/debian, this is overridden by the CHECK_INTERVALS var in
+# /etc/default/monit .  the below assumes you've set it to 30 seconds.
+#
+# if process dies, will restart sim within 30 seconds.  if process
+# dies 5 times in as many tries, will stop trying and send email
+# alert.
+#
+# if SimFPS drops to 0 for 2 minutes, restart.
+#
+# if process CPU usage stays above 300% for 2 minutes, restart.
+#
+# see ../README for configuration instructions.
+#
+
+
+check process opensim with pidfile /opt/os/bin/opensim.pid
+    start program = "/etc/init.d/opensim start"
+        group root
+    stop program = "/etc/init.d/opensim stop"
+    if cpu usage > 300% for 4 cycles then restart
+    if 5 restarts within 5 cycles then timeout
+    if failed url http://caprica.1studi.ru:9000/jsonSimStats/
+        and content != '"SimFPS":0.0,' for 4 cycles
+        then restart
+    if failed url http://caprica.1studi.ru:9000/jsonSimStats/
+        and content == '"SimFPS":' for 4 cycles
+then restart
