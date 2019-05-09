@@ -1,0 +1,42 @@
+This is just note!
+*******************
+
+
+#!/bin/sh
+#
+
+# replace YOUR_REGION_NAME with an appropriate name
+# replace PATH_TO_YOUR_OPENSIM_BIN_FOLDER with the appropriate FULL path from your server
+
+
+export MONO_THREADS_PER_CPU=150
+
+#adjust the above as appropriate to your server
+
+cd PATH_TO_YOUR_OPENSIM_BIN_FOLDER
+
+echo "Bringing YOUR_REGION_NAME online..."
+
+screen -S YOUR_REGION_NAME -dm env LANG=C mono OpenSim.exe
+
+echo "YOUR_REGION_NAME Loaded - objects rezzing and scripts starting . . . . "
+echo " "
+
+/usr/bin/screen -list
+
+
+
+*******************
+
+
+
+
+#!/bin/sh
+
+screen  -S YOUR_REGION_NAME -p 0 -X eval "stuff 'alert This Region will be closing down in 2 minutes.'^M"
+
+sleep 120
+
+screen  -S YOUR_REGION_NAME -p 0 -X eval "stuff 'shutdown'^M"
+
+#END
